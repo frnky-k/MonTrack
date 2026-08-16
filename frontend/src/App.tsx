@@ -5,6 +5,7 @@ import About from './components/about';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LuInstagram } from 'react-icons/lu';
 import { FaTelegram } from 'react-icons/fa6';
+import { API_URL } from './lib/api';
 
 function Home() {
   const [TotalIncome, setTotalIncome] = useState<string | number | undefined>();
@@ -21,7 +22,7 @@ function Home() {
 
   useEffect(() => {
     async function total_expenses() {
-      const res = await fetch(`http://localhost:8000/total_expenses?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/total_expenses?user_id=${userId}`)
       const data = await res.json();
       setTotalExpense(data)
     } total_expenses();
@@ -29,7 +30,7 @@ function Home() {
 
   useEffect(() => {
     async function total_income() {
-      const res = await fetch(`http://localhost:8000/total_income?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/total_income?user_id=${userId}`)
       const data = await res.json();
       setTotalIncome(data);
       formatCurrency(data)

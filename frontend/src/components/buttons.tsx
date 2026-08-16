@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { API_URL } from "../lib/api";
 
 export default function Buttons() {
   const [Transactions, setTransactions] = useState([]);
@@ -11,7 +11,7 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_transactions() {
-      const res = await fetch(`http://localhost:8000/transactions?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/transactions?user_id=${userId}`)
       const data = await res.json()
       setTransactions(data)
     }
@@ -20,7 +20,7 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_income() {
-      const res = await fetch(`http://localhost:8000/incomes?user_id=${userId}`);
+      const res = await fetch(`${API_URL}/incomes?user_id=${userId}`);
       const data = await res.json();
       setIncome(data);
 
@@ -29,7 +29,7 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_expense() {
-      const res = await fetch(`http://localhost:8000/expenses?user_id=${userId}`);
+      const res = await fetch(`${API_URL}/expenses?user_id=${userId}`);
       const data = await res.json()
       setExpense(data)
     } load_expense();
