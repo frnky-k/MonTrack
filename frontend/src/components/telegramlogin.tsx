@@ -13,7 +13,7 @@ type TelegramAuth = {
 
 declare global {
   interface Window {
-    onAuthTelegram: (user: TelegramAuth) => void;
+    onTelegramAuth: (user: TelegramAuth) => void;
   }
 }
 
@@ -21,12 +21,12 @@ export default function authTelegram(){
   const navigate = useNavigate()
 
   useEffect(() => {
-    window.onAuthTelegram = async(user: TelegramAuth) =>{
+    window.onTelegramAuth = async(user: TelegramAuth) =>{
     try{
       const res = await fetch (`${API_URL}/auth/telegram`,{
       method:"POST",
       headers:{
-        "Content-type":"application/json"
+        "Content-Type":"application/json"
       },
       body:JSON.stringify(user),
       credentials:"include"
@@ -49,10 +49,10 @@ export default function authTelegram(){
   script.setAttribute("data-onauth", "onTelegramAuth(user)");
   script.setAttribute("data-request-access", "write");
 
-  document.getElementById("telegram-id")?.appendChild(script);
+  document.getElementById("telegram-widget")?.appendChild(script);
 
   return () => {
-    document.getElementById("telegram-id")?.removeChild(script);
+    document.getElementById("telegram-widget")?.removeChild(script);
   }
   }, [navigate]);
   return (  
