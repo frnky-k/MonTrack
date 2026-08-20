@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 from models import Transactions, engine
-from auth import get_current_user
+from .auth import get_current_user
 
 router = APIRouter()
 Session = sessionmaker(bind=engine)
