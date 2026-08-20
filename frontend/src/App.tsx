@@ -6,12 +6,28 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LuInstagram } from 'react-icons/lu';
 import { FaTelegram } from 'react-icons/fa6';
 import { API_URL } from './lib/api';
+import TelegramLogin from './components/telegramlogin';
 
 function Home() {
   const [TotalIncome, setTotalIncome] = useState<string | number | undefined>();
   const [TotalExpense, setTotalExpense] = useState<string | number | undefined>();
+  const [userId, setUserId] = useState(null);
+  useEffect(()=>{
+    async function authMe(){
+      const res = await fetch(`${API_URL}/auth/me`, {
+        method:"GET",
+        headers:{
+          "Content-Type":"application/json",
+        },
+        credentials:"include"
+      });
+      const data = await res.json()
+      setUserId(data)
+    } 
+    authMe()
+  },[])
+  
 
-  const userId = 1387475697;
 
   const formatCurrency = (value: any, currecyCode = 'IDR', locale = 'id-ID') => {
     return new Intl.NumberFormat(locale, {
@@ -85,6 +101,7 @@ function Home() {
 }
 
 
+
 export default function Dashboard() {
 
 
@@ -93,7 +110,8 @@ export default function Dashboard() {
       <div>
         <Navbar />
         <Routes>
-          <Route path='/' element={<Home />} />
+          <Route path='/' element={<TelegramLogin />} />
+          <Route path='/dashboard' element={<Home />} />
           <Route path='/about' element={<About />} />
         </Routes>
       </div>

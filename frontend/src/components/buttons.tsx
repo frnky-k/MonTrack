@@ -7,11 +7,22 @@ export default function Buttons() {
   const [Expense, setExpense] = useState([]);
   const [buttons, setButtons] = useState<string | null>(null);
 
-  const userId = 1387475697;
+  // const userId = 1387475697;
+  // const userId = useEffect(()=>{
+  //   async function login(){
+  //     const res = await fetch(`${API_URL}/auth/telegram`)
+  //     const data = await res.json()
+  //     return data
+  //   }
+  //   login()
+  // },[])
 
   useEffect(() => {
     async function load_transactions() {
-      const res = await fetch(`${API_URL}/transactions?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/transactions`, {
+        method: 'GET',
+        credentials: "include"
+      })
       const data = await res.json()
       setTransactions(data)
     }
@@ -20,8 +31,11 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_income() {
-      const res = await fetch(`${API_URL}/incomes?user_id=${userId}`);
-      const data = await res.json();
+    const res = await fetch(`${API_URL}/transactions`, {
+        method: 'GET',
+        credentials: "include"
+      })
+    const data = await res.json();
       setIncome(data);
 
     } load_income();
@@ -29,7 +43,10 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_expense() {
-      const res = await fetch(`${API_URL}/expenses?user_id=${userId}`);
+       const res = await fetch(`${API_URL}/transactions`, {
+        method: 'GET',
+        credentials: "include"
+      })
       const data = await res.json()
       setExpense(data)
     } load_expense();

@@ -1,9 +1,19 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import Column, DateTime, Float, Integer, String, create_engine
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    create_engine,
+)
+
+from sqlalchemy.orm import declarative_base, relationship
 
 load_dotenv()
 DB_URL = os.getenv("DATABASE_URL")
@@ -12,19 +22,29 @@ if not DB_URL:
 Base = declarative_base()
 
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(BigInteger, unique=True, nullable=False)
+    username = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    photo_url = Column(String, nullable=False)
+    auth_date = Column(DateTime, default=datetime.utcnow)
+
+    transactions = relationship("Transactions", back_populates="user")
+
+
 class Transactions(Base):
     __tablename__ = "transactions"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(BigInteger, ForeignKey("users.user_id"), nullable=False)
     type = Column(String, default="Expense", nullable=False)
     item = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     category = Column(String, default="Uncategorized", nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # def __repr__(self):
-    # return f"Total: \n {self.item}, {self.amount}"
+    user = relationship("User", back_populates="transactions")
 
 
 engine = create_engine(DB_URL)
-# Base.metadata.create_all(engine)

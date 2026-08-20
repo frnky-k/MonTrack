@@ -1,14 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 from models import Transactions, engine
+from auth import get_current_user
 
 router = APIRouter()
 Session = sessionmaker(bind=engine)
 
 
 @router.get("/transactions")
-def get_transactions(user_id: int):
+def get_transactions(user_id: int = Depends(get_current_user)):
     session = Session()
     results = session.query(Transactions).filter(Transactions.user_id == user_id).all()
     session.close()

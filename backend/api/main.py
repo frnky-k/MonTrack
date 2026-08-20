@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import transactions
+from api.routes import transactions, auth
 
 app = FastAPI()
 app.add_middleware(
@@ -10,3 +10,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(transactions.router)
+app.include_router(auth.router)
