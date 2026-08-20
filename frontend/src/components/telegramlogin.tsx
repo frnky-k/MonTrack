@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export default async function authTelegram(){
+export default function authTelegram(){
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default async function authTelegram(){
     document.getElementById("telegram-id")?.removeChild(script);
   }
   }, [navigate]);
-  return (
+  return (  
     <div id="telegram-widget"/>
   )
 
