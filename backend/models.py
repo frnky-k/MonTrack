@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 import os
 
 from dotenv import load_dotenv
@@ -11,6 +11,7 @@ from sqlalchemy import (
     Integer,
     String,
     create_engine,
+    func
 )
 
 from sqlalchemy.orm import declarative_base, relationship
@@ -32,6 +33,14 @@ class User(Base):
     auth_date = Column(DateTime, default=datetime.utcnow)
 
     transactions = relationship("Transactions", back_populates="user")
+
+class TokenPending(Base):
+    __tablename__ = 'tokenpend'
+    id = Column(Integer, primary_key=True, nullable=False)
+    token = Column(String, unique=True, nullable=False, index=True)
+    chat_id = Column(BigInteger, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    confirmed_at = Column(DateTime, nullable=True)
 
 
 class Transactions(Base):

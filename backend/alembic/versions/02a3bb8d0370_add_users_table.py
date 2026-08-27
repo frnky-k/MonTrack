@@ -45,8 +45,21 @@ def upgrade() -> None:
         type_=sa.BigInteger(),
         existing_nullable=False,
     )
+    
+    op.execute("""
+        INSERT INTO users (user_id, username, first_name, photo_url)
+        SELECT DISTINCT
+            user_id,
+            'unknown_' || user_id::text,
+            'Unknown',
+            ''
+        FROM transactions
+        WHERE user_id IS NOT NULL
+        ON CONFLICT (user_id) DO NOTHING
+    """)
+
     op.create_foreign_key(
-        fk_transactions_user_id_users, "transactions", "users", ["user_id"], ["user_id"]
+        "fk_transactions_user_id_users", "transactions", "users", ["user_id"], ["user_id"]
     )
     # ### end Alembic commands ###
 

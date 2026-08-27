@@ -15,7 +15,7 @@ from telegram.ext import (
     filters,
 )
 
-from models import Transactions, engine
+from models import Transactions, engine, TokenPending
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -51,6 +51,7 @@ def handle_category(item):
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("RECEIVED:", update.effective_message.text if update.effective_message else None)
     message = update.effective_message
     if message is None or message.text is None:
         return
@@ -164,26 +165,26 @@ Total Expenses 💰 = Rp.{total}
         return
 
 
-async def start_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        message = update.effective_message
-        if message is None:
-            return
+# async def start_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     try:
+#         message = update.effective_message
+#         if message is None:
+#             return
 
-        await message.reply_text("""
-                                 Hello there! 👋 Welcome to MonTrack! >
-I’m your personal expense tracker right here in Telegram. No need to download extra apps or fill out messy spreadsheets—just chat with me, and I’ll keep your budget in check! 💸
+#         await message.reply_text("""
+#                                  Hello there! 👋 Welcome to MonTrack! >
+# I’m your personal expense tracker right here in Telegram. No need to download extra apps or fill out messy spreadsheets—just chat with me, and I’ll keep your budget in check! 💸
 
-You can tell me what you spent, I’ll log it and help you see where your money is going.
+# You can tell me what you spent, I’ll log it and help you see where your money is going.
 
-Ready to get started? Send your first expense right now, or type /help to see what I can do!
-                         """)
-    except TypeError:
-        assert update.effective_message is not None
-        await update.effective_message.reply_text(
-            "Something went Wrong, Please go to /help"
-        )
-        return
+# Ready to get started? Send your first expense right now, or type /help to see what I can do!
+#                          """)
+#     except TypeError:
+#         assert update.effective_message is not None
+#         await update.effective_message.reply_text(
+#             "Something went Wrong, Please go to /help"
+#         )
+#         return
 
 
 async def help_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -216,6 +217,22 @@ Command: /undo to delete your last entry. """)
         )
         return
 
+async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    session = Session()
+    args = context.args
+    if not args:
+        return
+    link_token = args[0]
+    chat_id = update.effective_chat.id
+    pending = session.query(TokenPending).filter_by(token=link_token).first()
+    if pending and not pending.chat_id:
+        pending.chat_id = chat_id
+        pending.confirmed_at = datetime.datetime.now()
+        session.commit()
+        await update.effective_message.reply_text("Linked, You can go back to wesbite")
+
+
+
 
 async def delete_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -246,7 +263,7 @@ async def delete_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-app.add_handler(CommandHandler("start", start_message))
+app.add_handler(CommandHandler("start", handle_start))
 app.add_handler(CommandHandler("help", help_message))
 app.add_handler(CommandHandler("undo", delete_message))
 app.add_handler(CommandHandler("summary", summary_message))

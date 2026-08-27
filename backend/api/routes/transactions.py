@@ -17,7 +17,7 @@ def get_transactions(user_id: int = Depends(get_current_user)):
 
 
 @router.get("/expenses")
-def get_expenses(user_id: int):
+def get_expenses(user_id: int = Depends(get_current_user)):
     session = Session()
     results = (
         session.query(Transactions)
@@ -29,7 +29,7 @@ def get_expenses(user_id: int):
 
 
 @router.get("/incomes")
-def get_income(user_id: int):
+def get_income(user_id: int = Depends(get_current_user)):
     session = Session()
     results = (
         session.query(Transactions)
@@ -41,7 +41,7 @@ def get_income(user_id: int):
 
 
 @router.get("/total_expenses")
-def get_total_expenses(user_id: int):
+def get_total_expenses(user_id: int = Depends(get_current_user)):
     session = Session()
     results = (
         session.query(func.sum(Transactions.amount))
@@ -54,7 +54,7 @@ def get_total_expenses(user_id: int):
 
 
 @router.get("/total_income")
-def get_total_income(user_id: int):
+def get_total_income(user_id: int =Depends(get_current_user)):
     session = Session()
     results = (
         session.query(func.sum(Transactions.amount))

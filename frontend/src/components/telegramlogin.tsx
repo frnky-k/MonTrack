@@ -1,63 +1,49 @@
-import { useNavigate } from "react-router-dom";
-import { API_URL } from "../lib/api";
-import { useEffect } from "react";
+  // import { useEffect, useState } from "react"
 
-type TelegramAuth = {
-  id: number
-  username: string
-  first_name: string
-  photo_url: string
-  auth_date: string
-  hash: string
-} 
+  import { API_URL } from "../lib/api";
+  // import { useEffect } from "react"
 
-declare global {
-  interface Window {
-    onTelegramAuth: (user: TelegramAuth) => void;
-  }
-}
 
-export default function authTelegram(){
-  const navigate = useNavigate()
+  import {useEffect } from "react";
 
-  useEffect(() => {
-    window.onTelegramAuth = async(user: TelegramAuth) =>{
-    try{
-      const res = await fetch (`${API_URL}/auth/telegram`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify(user),
-      credentials:"include"
-      })
-      const data = await res.json()
-      console.log(data.username)
-      navigate("/home")
+
+  export default function AuthTelegram(){
+    // const [chatID, setChatID] = useState([]);
+
+    
+    async function startTeleLink(){
+      const res = await fetch(`${API_URL}/auth/init`, {method:'POST'});
+      const {link_token} = await res.json();
+
+      sessionStorage.setItem("link_token", link_token);
+
+      window.open(`https://telegram.me/TrackNeyBot?start=${link_token}`, "_blank")
     }
-    catch(error){
-      console.error("Telegram Auth Error", error)
+
+    useEffect(() => {
+    const link_token = sessionStorage.getItem("link_token");
+    if (link_token) {
+      pollForLink(link_token);
+    }
+  }, []);
+
+  async function pollForLink(link_token: string) {
+    const res = await fetch(`${API_URL}/auth/status?link_token=${link_token}`, {
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (data.linked) {
+      sessionStorage.removeItem("link_token");
+      window.location.href = "/dashboard";
+    } else {
+      setTimeout(() => pollForLink(link_token), 2000);
     }
   }
 
-  
-  const script = document.createElement("script");
-  script.src = "https://telegram.org/js/telegram-widget.js?24";
-  script.async = true;
-  script.setAttribute("data-telegram-login", "TrackNeybot");
-  script.setAttribute("data-size", "large");
-  script.setAttribute("data-onauth", "onTelegramAuth(user)");
-  script.setAttribute("data-request-access", "write");
-
-  document.getElementById("telegram-widget")?.appendChild(script);
-
-  return () => {
-    document.getElementById("telegram-widget")?.removeChild(script);
+    return (
+      <div>
+        <button onClick={startTeleLink} className="w-full h-50 bg-red-600 text-white">login via telegram</button>
+      </div>
+    );
   }
-  }, [navigate]);
-  return (  
-    <div id="telegram-widget"/>
-  )
 
-  
-}

@@ -3,13 +3,14 @@ import hmac
 import os 
 import time
 import jwt
+import uuid
 
 
 from fastapi import APIRouter, HTTPException, Request, Response, status, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import session, sessionmaker
 from jwt.exceptions import InvalidTokenError
-from models import Base, User, engine
+from models import Base, User, engine, TokenPending
 from datetime import datetime, timedelta, timezone
 
 
@@ -24,26 +25,10 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
-class TelegramAuth(BaseModel):
-    id: int
-    username: str | None = None
-    first_name: str
-    photo_url: str | None = None
-    auth_date: int
-    hash: str
-
 class Token(BaseModel):
     access_token: str
     token_type: str
 
-def verify_telegram_hash(data: TelegramAuth):
-    data_dict = data.model_dump(exclude={"hash"}, exclude_none=True)
-    check_string = "\n".join(f"{k}={v}" for k, v in sorted(data_dict.items()))
-    secret_key = hashlib.sha256(BOT_TOKEN.encode()).digest()
-    computed_hash = hmac.new(
-        secret_key, check_string.encode(), hashlib.sha256
-    ).hexdigest()
-    return computed_hash == data.hash
 
 
 def create_access_token(data: dict, expire_date: timedelta | None = None):
@@ -56,6 +41,16 @@ def create_access_token(data: dict, expire_date: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt  
 
+@router.post('/auth/init')
+def init_user():
+    session = Session()
+    link_token = str(uuid.uuid4())
+    session.add(TokenPending(token=link_token, chat_id=None))
+    session.commit()
+    return {"link_token": link_token}
+
+
+
 def get_current_user(request: Request):
     token = request.cookies.get("access_token")
     credential_exception = HTTPException(
@@ -64,62 +59,45 @@ def get_current_user(request: Request):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user = payload.get("id")
+        user = payload.get("user_id")
         if user is None:
             raise credential_exception
         return user
     except InvalidTokenError:
         raise credential_exception
 
-    
-
-@router.post("/auth/telegram")
-def telegram_login(data: TelegramAuth, response: Response):
-    if not verify_telegram_hash(data):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    if time.time() - data.auth_date > 86400:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-
-    def get_or_create_user(telegram_data):
-        session = Session()
-
-        check_login = (
-            session.query(User).filter(User.user_id == telegram_data.id).first()
-        )
-        if not check_login:
-            new_user = User(
-                user_id=telegram_data.id,
-                username=telegram_data.username,
-                first_name=telegram_data.first_name,
-                photo_url=telegram_data.photo_url,
-                auth_date=telegram_data.auth_date,
-            )
-
-            session.add(new_user)
+def get_or_create_user_by_chat_id(chat_id: int):
+    with Session() as session:
+        user = session.query(User).filter(User.user_id == chat_id).first()
+        if not user:
+            user = User(user_id=chat_id, username="", first_name="", photo_url="")
+            session.add(user)
             session.commit()
-            session.refresh(new_user)
-            session.close()
-            return new_user
-        else:
-            session.close()
-            return check_login
+            session.refresh(user)
+        session.close()
+        return user
 
-    user = get_or_create_user(data)
-
-    if user:
-        access_token = create_access_token(data={"id":user.user_id}, expire_date=ACCESS_TOKEN_EXPIRE_MINUTES)
-        response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True, 
-            samesite="none",
-            secure=True
-        )
-        return {"username":data.username, "id":data.id}
+@router.get("/auth/status")
+def check_status(link_token: str, response: Response):
+    with Session() as session:
+        pending = session.query(TokenPending).filter_by(token=link_token).first()
+        if pending and pending.chat_id:
+            user = get_or_create_user_by_chat_id(pending.chat_id)
+            jwt_token = create_access_token(data={"user_id":pending.chat_id}, expire_date=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+            response.set_cookie(
+                "access_token", jwt_token, 
+                httponly=True, samesite="none", secure=True,
+            )
+            return {"linked": True}
+        return {"linked":False}
 
 @router.get("/auth/me")
-def get_user(current_user: int = Depends(get_current_user)):
-    return current_user
-
-    
-
+def get_user(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401)
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except:
+        raise HTTPException(status_code=401)
+    return {"user_id": payload["user_id"]}

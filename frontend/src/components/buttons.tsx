@@ -1,25 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { API_URL } from "../lib/api";
+import { AuthContext } from "../App";
 
 export default function Buttons() {
+  const { userId } = useContext(AuthContext)
   const [Transactions, setTransactions] = useState([]);
   const [Income, setIncome] = useState([]);
   const [Expense, setExpense] = useState([]);
   const [buttons, setButtons] = useState<string | null>(null);
 
-  // const userId = 1387475697;
-  // const userId = useEffect(()=>{
-  //   async function login(){
-  //     const res = await fetch(`${API_URL}/auth/telegram`)
-  //     const data = await res.json()
-  //     return data
-  //   }
-  //   login()
-  // },[])
+
 
   useEffect(() => {
     async function load_transactions() {
-      const res = await fetch(`${API_URL}/transactions`, {
+      const res = await fetch(`${API_URL}/transactions?`, {
         method: 'GET',
         credentials: "include"
       })
@@ -27,11 +21,11 @@ export default function Buttons() {
       setTransactions(data)
     }
     load_transactions();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     async function load_income() {
-    const res = await fetch(`${API_URL}/transactions`, {
+    const res = await fetch(`${API_URL}/transactions?`, {
         method: 'GET',
         credentials: "include"
       })
@@ -39,18 +33,18 @@ export default function Buttons() {
       setIncome(data);
 
     } load_income();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     async function load_expense() {
-       const res = await fetch(`${API_URL}/transactions`, {
+       const res = await fetch(`${API_URL}/transactions?`, {
         method: 'GET',
         credentials: "include"
       })
       const data = await res.json()
       setExpense(data)
     } load_expense();
-  }, []);
+  }, [userId]);
 
 
   const formatCurrency = (value: any, currecyCode = 'IDR', locale = 'id-ID') => {
@@ -88,7 +82,7 @@ export default function Buttons() {
                   <th>Type</th>
                 </tr>
               </thead>
-              <tbody className="text-xs text-[#6b6375]">
+              <tbody className="text-xs text-[#6b6375] capitalize">
                 {Transactions.map((t: any) => (
                   <tr key={t.id} className="text-sm">
                     <td>{t.created_at.split("T", 1)}</td>
@@ -134,7 +128,7 @@ export default function Buttons() {
 
         {buttons === 'Expense' &&
           <div>
-            <table className="w-full text-center">
+            <table className="w-full text-center capitalize">
               <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375]">
                 <tr>
                   <th>Date</th>

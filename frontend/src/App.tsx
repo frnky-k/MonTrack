@@ -1,31 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { type ReactNode } from 'react';
 import Buttons from './components/buttons';
 import Navbar from './components/nav';
 import About from './components/about';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { LuInstagram } from 'react-icons/lu';
 import { FaTelegram } from 'react-icons/fa6';
 import { API_URL } from './lib/api';
-import TelegramLogin from './components/telegramlogin';
+import AuthTelegram from './components/telegramlogin';
 
 function Home() {
   const [TotalIncome, setTotalIncome] = useState<string | number | undefined>();
   const [TotalExpense, setTotalExpense] = useState<string | number | undefined>();
-  const [userId, setUserId] = useState(null);
-  useEffect(()=>{
-    async function authMe(){
-      const res = await fetch(`${API_URL}/auth/me`, {
-        method:"GET",
-        headers:{
-          "Content-Type":"application/json",
-        },
-        credentials:"include"
-      });
-      const data = await res.json()
-      setUserId(data)
-    } 
-    authMe()
-  },[])
+  const { userId } = useContext(AuthContext)
+ 
   
 
 
@@ -38,20 +26,26 @@ function Home() {
 
   useEffect(() => {
     async function total_expenses() {
-      const res = await fetch(`${API_URL}/total_expenses?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/total_expenses`, {
+        method:'GET',
+        credentials:"include"
+      })
       const data = await res.json();
       setTotalExpense(data)
     } total_expenses();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     async function total_income() {
-      const res = await fetch(`${API_URL}/total_income?user_id=${userId}`)
+      const res = await fetch(`${API_URL}/total_income`,{
+        method:'GET',
+        credentials:"include"
+      })
       const data = await res.json();
       setTotalIncome(data);
       formatCurrency(data)
     } total_income();
-  }, []);
+  }, [userId]);
 
 
   return (
@@ -100,21 +94,69 @@ function Home() {
   );
 }
 
+type AuthState = "checking" | "authed" | "guest";
+export const AuthContext = createContext<{ authState: AuthState; userId: string | null }>({
+  authState: "checking",
+  userId: null,
+});
+
+function AuthProvider({ children }: { children: ReactNode }) {
+  const [authState, setAuthState] = useState<AuthState>("checking");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_URL}/auth/me`, { credentials: "include" })
+      .then(async res => {
+        if (res.ok) {
+          const data = await res.json();
+          setUserId(data.user_id);
+          setAuthState("authed");
+        } else {
+          setAuthState("guest");
+        }
+      })
+      .catch(() => setAuthState("guest"));
+  }, []);
+
+  return <AuthContext.Provider value={{authState, userId}}>{children}</AuthContext.Provider>;
+}
+
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const {authState} = useContext(AuthContext);
+  // if (authState === "checking") return <LoadingSpinner />;
+  return authState === "authed" ? children : <Navigate to="/" replace />;
+}
+
+function RedirectIfAuthed({ children }: { children: ReactNode }) {
+  const {authState} = useContext(AuthContext);
+  // if (authState === "checking") return <LoadingSpinner />;
+  return authState === "authed" ? <Navigate to="/dashboard" replace /> : children;
+}
+
+
+
 
 
 export default function Dashboard() {
 
 
   return (
+    
     <BrowserRouter>
+    <AuthProvider>
       <div>
         <Navbar />
         <Routes>
-          <Route path='/' element={<TelegramLogin />} />
-          <Route path='/dashboard' element={<Home />} />
+          <Route path='/' element={
+            <RedirectIfAuthed><AuthTelegram /></RedirectIfAuthed>
+          } />
+          <Route path='/dashboard' element={
+            <ProtectedRoute><Home /></ProtectedRoute>
+          } />
           <Route path='/about' element={<About />} />
         </Routes>
       </div>
+      </AuthProvider>
     </BrowserRouter>
   )
 
