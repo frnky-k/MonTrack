@@ -5,7 +5,7 @@ from api.routes import transactions, auth
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://montrack-v1.vercel.app","https://sandbar-reply-groggy.ngrok-free.dev "],
+    allow_origins=["http://localhost:5173", "https://mon-track.vercel.app/",],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
