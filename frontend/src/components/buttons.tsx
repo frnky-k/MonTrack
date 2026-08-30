@@ -84,7 +84,10 @@ export default function Buttons() {
               </thead>
               <tbody className="text-xs text-[#6b6375] capitalize">
                 {Transactions.length == 0 ? (
-                  <p className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</p>
+                  <tr>
+                    <td colSpan={5} className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</td>
+                  </tr>
+                  
                 ):(Transactions.map((t: any) => (
                   <tr key={t.id} className="text-sm">
                     <td>{t.created_at.split("T", 1)}</td>
@@ -114,7 +117,10 @@ export default function Buttons() {
               </thead>
               <tbody className="text-xs text-[#6b6375]">
                 {Income.length == 0 ? (
-                  <p className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</p>
+                  <tr>
+                    <td colSpan={5} className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</td>
+                  </tr>
+                  
                 ):(
                   Income.map((i: any) => (
                   <tr key={i.id} className="text-sm capitalize">
@@ -147,7 +153,10 @@ export default function Buttons() {
               </thead>
               <tbody className="text-xs text-[#6b6375]">
                 {Expense.length == 0 ? (
-                  <p className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</p>
+                  <tr>
+                    <td colSpan={5} className="text-[#6b6375] text-sm text-center p-4">No Transactions Found</td>
+                  </tr>
+                  
                 ):(
                   Expense.map((e: any) => (
                   <tr key={e.id} className="text-sm">
