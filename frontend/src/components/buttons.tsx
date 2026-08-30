@@ -83,7 +83,9 @@ export default function Buttons() {
                 </tr>
               </thead>
               <tbody className="text-xs text-[#6b6375] capitalize">
-                {Transactions.map((t: any) => (
+                {Transactions.length == 0 ? (
+                  <p className="text-[#6b6375] text-sm">No Transactions Found</p>
+                ):(Transactions.map((t: any) => (
                   <tr key={t.id} className="text-sm">
                     <td>{t.created_at.split("T", 1)}</td>
                     <td>{t.item}</td>
@@ -91,6 +93,7 @@ export default function Buttons() {
                     <td>{formatCurrency(t.amount)}</td>
                     <td style={{ color: t.type === 'Income' ? '#11e002' : '#fc0000' }}>{t.type}</td>
                   </tr>
+                )
                 )
                 )}
               </tbody>
@@ -110,7 +113,10 @@ export default function Buttons() {
                 </tr>
               </thead>
               <tbody className="text-xs text-[#6b6375]">
-                {Income.map((i: any) => (
+                {Income.length == 0 ? (
+                  <p className="text-[#6b6375] text-sm">No Transactions Found</p>
+                ):(
+                  Income.map((i: any) => (
                   <tr key={i.id} className="text-sm capitalize">
                     <td>{i.created_at.split("T", 1)}</td>
                     <td>{i.item}</td>
@@ -118,6 +124,7 @@ export default function Buttons() {
                     <td>{formatCurrency(i.amount)}</td>
                     <td style={{ color: i.type === 'Income' ? '#11e002' : '#fc0000' }}>{i.type}</td>
                   </tr>
+                )
                 )
                 )}
               </tbody>
@@ -139,7 +146,10 @@ export default function Buttons() {
                 </tr>
               </thead>
               <tbody className="text-xs text-[#6b6375]">
-                {Expense.map((e: any) => (
+                {Expense.length == 0 ? (
+                  <p className="text-[#6b6375] text-sm">No Transactions Found</p>
+                ):(
+                  Expense.map((e: any) => (
                   <tr key={e.id} className="text-sm">
                     <td>{e.created_at.split("T", 1)}</td>
                     <td>{e.item}</td>
@@ -147,6 +157,7 @@ export default function Buttons() {
                     <td>{formatCurrency(e.amount)}</td>
                     <td style={{ color: e.type === 'Income' ? '#11e002' : '#fc0000' }}>{e.type}</td>
                   </tr>
+                )
                 )
                 )}
               </tbody>
