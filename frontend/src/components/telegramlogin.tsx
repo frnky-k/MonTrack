@@ -9,6 +9,7 @@ import { Loader } from "lucide-react";
 import Tutorial from "./tutorial";
 
 
+
 export default function AuthTelegram(){
   const [isLoading, setIsLoading] = useState(false)  
   const slides = [
@@ -25,6 +26,8 @@ export default function AuthTelegram(){
       sessionStorage.setItem("link_token", link_token);
 
       window.open(`https://telegram.me/TrackNeyBot?start=${link_token}`, "_blank")
+
+      pollForLink(link_token)
     }
     catch(error){
       console.error("Connection Error", error);
