@@ -101,3 +101,8 @@ def get_user(request: Request):
     except:
         raise HTTPException(status_code=401)
     return {"user_id": payload["user_id"]}
+
+@router.post("/auth/logout")
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"ok": True}

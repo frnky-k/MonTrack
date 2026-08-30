@@ -229,8 +229,11 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pending.chat_id = chat_id
         pending.confirmed_at = datetime.datetime.now()
         session.commit()
-        await update.effective_message.reply_text("Linked, You can go back to wesbite")
+        await update.effective_message.reply_text("""🔗 Linked, You can go back to wesbite \n
 
+Hello there! 👋 Welcome to MonTrack! I’m your personal expense tracker right here in Telegram.\n
+No need to download extra apps or fill out messy spreadsheets—just chat with me, and I’ll keep your budget in check!\n
+💸 You can tell me what you spent, I’ll log it and help you see where your money is going. Ready to get started? Send your first expense right now, or type /help to see what I can do!""")
 
 
 

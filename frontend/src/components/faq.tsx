@@ -2,9 +2,9 @@ import { ChevronRight } from "lucide-react"
 
 export default function Faq() {
   return (
-    <ul className="max-w-2xl mx-5 px-2 divide-y shadow rounded-x text-[#f1f5f9]">
+    <ul className="w-full max-w-2xl space-y-2 px-2 divide-y shadow rounded-x text-[#f1f5f9]">
       <li >
-        <details className="group w-2xl">
+        <details className="group">
           <summary className="flex items-center text-black gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
             <ChevronRight className="transition group-open:rotate-90" />
             <span>How do I record my expenses and income?</span>
@@ -12,13 +12,13 @@ export default function Faq() {
           <article className="p-4 bg-[#f1f5f9] text-black">
             <p>
               It’s simple! Just open our designated Telegram bot
-              and send a message detailing your transaction (e.g., -$15 lunch or +$500 salary). The bot will process your input and save it securely to your account.
+              and send a message detailing your transaction (e.g., lunch 10000 or + salary 50000). The bot will process your input and save it securely to your account.
             </p>
           </article>
         </details>
       </li>
       <li>
-        <details className="group w-2xl">
+        <details className="group">
           <summary className="flex items-center text-black gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
             <ChevronRight className="transition group-open:rotate-90" />
             <span>Why don't I see my recent Telegram input immediately on the website?</span>
@@ -30,7 +30,7 @@ export default function Faq() {
         </details>
       </li>
       <li>
-        <details className="group w-2xl">
+        <details className="group">
           <summary className="flex items-center text-black gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
             <ChevronRight className="transition group-open:rotate-90" />
             <span>Is my financial data secure?</span>
@@ -42,7 +42,7 @@ export default function Faq() {
         </details>
       </li>
       <li>
-        <details className="group w-2xl">
+        <details className="group">
           <summary className="flex items-center text-black gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
             <ChevronRight className="transition group-open:rotate-90" />
             <span>Is MonTrack free to use?</span>
@@ -54,7 +54,7 @@ export default function Faq() {
         </details>
       </li>
       <li>
-        <details className="group w-2xl">
+        <details className="group">
           <summary className="flex items-center text-black gap-3 px-4 py-3 font-medium marker:content-none hover:cursor-pointer">
             <ChevronRight className="transition group-open:rotate-90" />
             <span>Can I edit or delete a transaction once it's saved?</span>

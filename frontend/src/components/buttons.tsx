@@ -25,7 +25,7 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_income() {
-    const res = await fetch(`${API_URL}/transactions?`, {
+    const res = await fetch(`${API_URL}/incomes?`, {
         method: 'GET',
         credentials: "include"
       })
@@ -37,7 +37,7 @@ export default function Buttons() {
 
   useEffect(() => {
     async function load_expense() {
-       const res = await fetch(`${API_URL}/transactions?`, {
+       const res = await fetch(`${API_URL}/expenses?`, {
         method: 'GET',
         credentials: "include"
       })
@@ -58,7 +58,7 @@ export default function Buttons() {
 
   return (
     <div className="p-4">
-      <div className="p-2 w-fit bg-[#f1f5f9] rounded-md grid grid-cols-3 gap-2">
+      <div className="p-2 overflow-x-auto w-fit bg-[#f1f5f9] rounded-md grid grid-cols-3 gap-2">
         <button onClick={() => setButtons('All')}
           style={{ backgroundColor: (!buttons || buttons === 'All') ? '#fff' : '#f1f5f9' }}
           className="text-sm rounded-md px-2 py-1 font-semibold">All</button>
@@ -69,11 +69,11 @@ export default function Buttons() {
           style={{ backgroundColor: buttons === 'Expense' ? '#fff' : '#f1f5f9' }}
           className="text-sm rounded-md px-2.5 py-1 font-semibold">Expense</button>
       </div>
-      <div className="p-2 w-full">
+      <div className="p-2 flex flex-col items-center md:block">
         {(!buttons || buttons === 'All') &&
-          <div>
+          <div className="w-full overflow-x-auto h-64 overflow-y-auto ">
             <table className="w-full text-center">
-              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375]">
+              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375] sticky top-0 bg-[#fafafa] ">
                 <tr>
                   <th>Date</th>
                   <th>Item</th>
@@ -98,9 +98,9 @@ export default function Buttons() {
           </div>
         }
         {buttons === 'Income' &&
-          <div>
-            <table className="w-full text-center">
-              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375]">
+          <div  className="w-full overflow-x-auto h-64 overflow-y-auto">
+            <table className="w-full text-center capitalize">
+              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375] sticky top-0 bg-[#fafafa]">
                 <tr>
                   <th>Date</th>
                   <th>Item</th>
@@ -127,9 +127,9 @@ export default function Buttons() {
 
 
         {buttons === 'Expense' &&
-          <div>
+          <div className="w-full overflow-x-auto h-64 overflow-y-auto">
             <table className="w-full text-center capitalize">
-              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375]">
+              <thead className="border border-t-0 border-r-0 border-l-0 border-[#dbdbdb] text-sm text-[#6b6375] sticky top-0 bg-[#fafafa]">
                 <tr>
                   <th>Date</th>
                   <th>Item</th>

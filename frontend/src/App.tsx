@@ -6,6 +6,7 @@ import About from './components/about';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { LuInstagram } from 'react-icons/lu';
 import { FaTelegram } from 'react-icons/fa6';
+import { LogOutIcon } from 'lucide-react';
 import { API_URL } from './lib/api';
 import AuthTelegram from './components/telegramlogin';
 
@@ -22,6 +23,17 @@ function Home() {
       style: 'currency',
       currency: currecyCode,
     }).format(value)
+  }
+
+  async function logout(){
+    const res = await fetch(`${API_URL}/auth/logout`, {
+      method:'POST', 
+      credentials:'include'
+    })
+    const data = await res.json()
+    window.location.reload()
+    return data;
+    
   }
 
   useEffect(() => {
@@ -53,9 +65,8 @@ function Home() {
       <h1 className='text-2xl'>Transactions History</h1>
       <p>View and manage your transactions via Telegram</p>
       <Buttons />
-      <section className='flex justify-center gap-10 items-center text-center p-3'>
-        <div className='border-l-5 border-l-[#02cf09] w-full md:w-1/2 py-10 text-2xl text-start font-bold text-[#00000]'>
-
+      <section className='flex flex-col justify-center gap-10 items-center text-center p-3 md:flex-row '>
+        <div className='border-l-4 border-l-[#02cf09] w-full md:w-1/2 py-6 px-4 text-2xl text-start font-bold text-[#00000] shadow-sm rounded-lg'>
           <div className='grid grid-rows-3 px-2 '>
             <img src='/increase.svg' className='w-6.25'></img>
             <p className='text-sm text-[#6b6375]'>Total Income</p>
@@ -63,7 +74,7 @@ function Home() {
           </div>
 
         </div>
-        <div className='border-l-5 border-l-[#c90502] w-full md:w-1/2  py-10 text-2xl text-start font-bold'>
+        <div className='border-l-4 border-l-[#c90502] w-full md:w-1/2  text-2xl py-6 px-4 text-2xl text-start font-bold shadow-sm rounded-lg'>
           <div className='grid grid-rows-3 px-2 '>
             <img src='/decrease.svg' className='w-6.25'></img>
             <p className='text-sm text-[#6b6375]'>Total Expense</p>
@@ -71,6 +82,14 @@ function Home() {
           </div>
         </div>
       </section>
+      <section className='px-3 py-5 flex justify-end items-end'>
+        
+        <button onClick={logout} className="bg-red-600 hover:bg-red-700 transition text-white gap-2 flex items-center px-6 py-3 w-fit  rounded-md font-medium shadow-md">
+          <LogOutIcon />
+          <span>Logout</span>
+        </button>
+      </section>
+      
       <footer>
         <div className='h-0.5 w-full bg-[#f1f5f9] mt-20'></div>
         <div className='flex items-center justify-center mt-5  flex-col'>
