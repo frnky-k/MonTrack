@@ -109,6 +109,6 @@ def logout(response: Response):
         path="/",
         httponly=True,
         secure=True,
-        samesite=None
+        samesite="none"
         )
     return {"ok": True}
