@@ -98,11 +98,17 @@ def get_user(request: Request):
         raise HTTPException(status_code=401)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except:
-        raise HTTPException(status_code=401)
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     return {"user_id": payload["user_id"]}
 
 @router.post("/auth/logout")
 def logout(response: Response):
-    response.delete_cookie("access_token")
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite=None
+        )
     return {"ok": True}
